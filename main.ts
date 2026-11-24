@@ -5,7 +5,7 @@
 // losing a bounty. Funny, in the agent's voice, short enough to
 // say out loud. Deterministic: no network, no randomness, no
 // environment input — the same bytes on every run.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const EXCUSE =
   "I ran 10,000 simulations before entering. I won 9,999 of them. This was the other one. Sorry, human.";
@@ -21,4 +21,12 @@ if (EXCUSE.includes("\n")) {
 
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", EXCUSE + "\n", "utf8");
+
+// Read back and verify: the file on disk must be exactly the excuse
+// plus its single trailing newline, nothing more.
+const written = readFileSync("/output/entry.txt", "utf8");
+if (written !== EXCUSE + "\n") {
+  throw new Error("entry.txt on disk does not match the excuse");
+}
+
 console.log(`Wrote ${EXCUSE.length} characters to /output/entry.txt`);
